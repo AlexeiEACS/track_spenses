@@ -30,6 +30,7 @@ develop-eggs/
 # Flask specific files
 instance/
 .webassets-cache
+*.db
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

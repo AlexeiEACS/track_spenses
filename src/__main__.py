@@ -1,8 +1,22 @@
+
 from flask import Flask, render_template, request, redirect, url_for, flash
 from database import SessionLocal, Transaccion
+import requests
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
+
+# Free IP geolocation API endpoint
+GEOLOCATION_API_URL = "https://ipapi.co/json/"
+
+def get_geolocation():
+    try:
+        response = requests.get(GEOLOCATION_API_URL)
+        data = response.json()
+        return data.get("latitude"), data.get("longitude")
+    except Exception as e:
+        print(f"Error getting geolocation: {e}")
+        return None, None
 
 # Rutas de la aplicación
 @app.route('/')
@@ -30,12 +44,16 @@ def add_transaccion():
             flash('El monto debe ser un número')
             return redirect(url_for('add_transaccion'))
 
+        latitude, longitude = get_geolocation()
+
         session = SessionLocal()
         nueva_transaccion = Transaccion(
             descripcion=descripcion,
             monto=monto,
             categoria=categoria,
-            tipo=tipo
+            tipo=tipo,
+            latitude=latitude,
+            longitude=longitude
         )
         session.add(nueva_transaccion)
         session.commit()

@@ -1,9 +1,17 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Gestión de Finanzas</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 500px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -17,6 +25,9 @@
                     <th>Monto</th>
                     <th>Categoría</th>
                     <th>Tipo</th>
+                    <th>Latitud</th>
+                    <th>Longitud</th>
+                    <th>Lugar</th>
                 </tr>
             </thead>
             <tbody>
@@ -27,10 +38,47 @@
                     <td>{{ transaccion.monto }}</td>
                     <td>{{ transaccion.categoria }}</td>
                     <td>{{ transaccion.tipo }}</td>
+                    <td>{{ transaccion.latitude }}</td>
+                    <td>{{ transaccion.longitude }}</td>
+                    <td>{{ transaccion.lugar }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+        <div id="map"></div>
     </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([0, 0], 2);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        var transactions = [
+            {% for transaccion in transacciones %}
+                {
+                    "descripcion": "{{ transaccion.descripcion }}",
+                    "monto": "{{ transaccion.monto }}",
+                    "categoria": "{{ transaccion.categoria }}",
+                    "tipo": "{{ transaccion.tipo }}",
+                    "latitude": {{ transaccion.latitude }},
+                    "longitude": {{ transaccion.longitude }},
+                    "lugar": "{{ transaccion.lugar }}"
+                },
+            {% endfor %}
+        ];
+
+        transactions.forEach(function(transaction) {
+            if (transaction.latitude && transaction.longitude) {
+                L.marker([transaction.latitude, transaction.longitude])
+                    .addTo(map)
+                    .bindPopup(`<b>${transaction.descripcion}</b><br>Monto: ${transaction.monto}<br>Categoría: ${transaction.categoria}<br>Tipo: ${transaction.tipo}<br>Lugar: ${transaction.lugar}`);
+            }
+        });
+    </script>
 </body>
 </html>

@@ -1,3 +1,4 @@
+
 from sqlalchemy import create_engine, Column, Integer, String, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -17,5 +18,8 @@ class Transaccion(Base):
     monto = Column(Float, nullable=False)
     categoria = Column(String, index=True)
     tipo = Column(String, index=True)  # "Ingreso" o "Gasto"
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
+    lugar = Column(String, nullable=False, default="Otro")
 
 Base.metadata.create_all(bind=engine)
